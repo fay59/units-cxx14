@@ -1,6 +1,6 @@
 //
 // units.hpp
-// units-cxx11
+// units-cxx14
 // 
 // Copyright (c) 2016 Félix Cloutier
 // 
