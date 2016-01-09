@@ -11,8 +11,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,8 +23,10 @@
 // SOFTWARE.
 //
 
-
 #include "units.hpp"
+
+using namespace std;
+using namespace detail;
 
 template<typename Seq, size_t N>
 struct get_at;
@@ -51,19 +53,28 @@ void static_sequence_tests()
 	auto seq3 = combine_sequences(seq1, seq2);
 	
 	auto leftOf5 = left_of<decltype(seq3), size_t, 5>::type{};
-	static_assert(sequence_contains<size_t, 4>(leftOf5), "left_of/sequence_contains");
-	static_assert(!sequence_contains<size_t, 5>(leftOf5), "left_of/sequence_contains");
-	static_assert(!sequence_contains<size_t, 6>(leftOf5), "left_of/sequence_contains");
+	static_assert(sequence_contains<size_t, 4>(leftOf5),
+		"left_of/sequence_contains");
+	static_assert(!sequence_contains<size_t, 5>(leftOf5),
+		"left_of/sequence_contains");
+	static_assert(!sequence_contains<size_t, 6>(leftOf5),
+		"left_of/sequence_contains");
 	
 	auto rightOf2 = right_of<decltype(seq3), size_t, 2>::type{};
-	static_assert(!sequence_contains<size_t, 1>(rightOf2), "right_of/sequence_contains");
-	static_assert(!sequence_contains<size_t, 2>(rightOf2), "right_of/sequence_contains");
-	static_assert(sequence_contains<size_t, 3>(rightOf2), "right_of/sequence_contains");
+	static_assert(!sequence_contains<size_t, 1>(rightOf2),
+		"right_of/sequence_contains");
+	static_assert(!sequence_contains<size_t, 2>(rightOf2),
+		"right_of/sequence_contains");
+	static_assert(sequence_contains<size_t, 3>(rightOf2),
+		"right_of/sequence_contains");
 	
 	auto no3 = removed_from<decltype(seq3), size_t, 3>::type{};
-	static_assert(sequence_contains<size_t, 2>(no3), "removed_from/sequence_contains");
-	static_assert(!sequence_contains<size_t, 3>(no3), "removed_from/sequence_contains");
-	static_assert(sequence_contains<size_t, 4>(no3), "removed_from/sequence_contains");
+	static_assert(sequence_contains<size_t, 2>(no3),
+		"removed_from/sequence_contains");
+	static_assert(!sequence_contains<size_t, 3>(no3),
+		"removed_from/sequence_contains");
+	static_assert(sequence_contains<size_t, 4>(no3),
+		"removed_from/sequence_contains");
 	
 	static_assert(sequence_max<decltype(seq3)>::value == 6, "sequence_max");
 	
@@ -76,7 +87,8 @@ void static_sequence_tests()
 	static_assert(seq_get<4>(seq4Sorted) == 5, "sorted/seq_get");
 	static_assert(seq_get<5>(seq4Sorted) == 6, "sorted/seq_get");
 	
-	auto seq5 = remove_intersection<decltype(seq4Sorted), sequence<size_t, 2, 5>>::type{};
+	auto seq5 = remove_intersection<decltype(seq4Sorted),
+		sequence<size_t, 2, 5>>::type{};
 	static_assert(seq_get<0>(seq5) == 1, "sorted/seq_get");
 	static_assert(seq_get<1>(seq5) == 3, "sorted/seq_get");
 	static_assert(seq_get<2>(seq5) == 4, "sorted/seq_get");
