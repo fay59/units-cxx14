@@ -203,14 +203,14 @@ namespace detail
 	};
 }
 
-namespace units
+namespace unitscxx
 {
 	template<typename UnitEnum, UnitEnum... S>
-	using UnitProduct = typename detail::sorted<
+	using unit_product = typename detail::sorted<
 		detail::sequence<UnitEnum, S...>>::type;
 
 	template<typename Den, typename Num>
-	struct UnitQuotient
+	struct unit_quotient
 	{
 		typedef Den denominator;
 		typedef Num numerator;
@@ -218,69 +218,69 @@ namespace units
 		static_assert(std::is_same<
 			typename denominator::value_type,
 			typename numerator::value_type>::value,
-			"UnitQuotient with incompatible unit systems");
+			"unit_quotient with incompatible unit systems");
 	};
 
 	template<typename NumericType, typename Quotient>
-	class Quantity
+	class quantity
 	{
 		NumericType rawValue;
 	
 	public:
 		typedef Quotient Units;
 	
-		Quantity() = default;
-		Quantity(const Quantity&) = default;
-		Quantity(Quantity&&) = default;
-		Quantity& operator=(const Quantity&) = default;
-		Quantity& operator=(Quantity&&) = default;
+		quantity() = default;
+		quantity(const quantity&) = default;
+		quantity(quantity&&) = default;
+		quantity& operator=(const quantity&) = default;
+		quantity& operator=(quantity&&) = default;
 	
-		explicit Quantity(NumericType rawValue)
+		explicit quantity(NumericType rawValue)
 		: rawValue(rawValue)
 		{
 		}
 	
 		NumericType raw() const { return rawValue; }
 	
-		Quantity& operator+=(Quantity that) const
+		quantity& operator+=(quantity that) const
 		{
 			return *this = *this + that; 
 		}
 	
-		Quantity& operator-=(Quantity that) const
+		quantity& operator-=(quantity that) const
 		{
 			return *this = *this - that; 
 		}
 	
-		Quantity operator-(Quantity that) const
+		quantity operator-(quantity that) const
 		{
-			return Quantity(raw() - that.raw());
+			return quantity(raw() - that.raw());
 		}
 	
-		Quantity operator+(Quantity that) const
+		quantity operator+(quantity that) const
 		{
-			return Quantity(raw() + that.raw());
+			return quantity(raw() + that.raw());
 		}
 	
-		Quantity& operator*=(NumericType that)
+		quantity& operator*=(NumericType that)
 		{
 			rawValue *= that;
 			return *this;
 		}
 	
-		Quantity& operator/=(NumericType that)
+		quantity& operator/=(NumericType that)
 		{
 			rawValue /= that;
 			return *this;
 		}
 	
-		Quantity operator*(NumericType that) const
+		quantity operator*(NumericType that) const
 		{
-			return Quantity(raw() * that);
+			return quantity(raw() * that);
 		}
 	
 		template<typename NT, typename Q>
-		auto operator*(Quantity<NT, Q> that) const
+		auto operator*(quantity<NT, Q> that) const
 		{
 			typedef typename detail::combine<
 				typename Units::denominator,
@@ -301,19 +301,19 @@ namespace units
 			typedef typename detail::sorted<UnsortedNumerator>::type Numerator;
 			typedef typename detail::sorted<UnsortedDenominator>::type
 				Denominator;
-			typedef UnitQuotient<Denominator, Numerator> ResultUnits;
+			typedef unit_quotient<Denominator, Numerator> ResultUnits;
 		
 			auto rawQuantity = raw() * that.raw();
-			return Quantity<decltype(rawQuantity), ResultUnits>(rawQuantity);
+			return quantity<decltype(rawQuantity), ResultUnits>(rawQuantity);
 		}
 	
-		Quantity operator/(NumericType that) const
+		quantity operator/(NumericType that) const
 		{
-			return Quantity(raw() / that);
+			return quantity(raw() / that);
 		}
 	
 		template<typename NT, typename Q>
-		auto operator/(Quantity<NT, Q> that) const
+		auto operator/(quantity<NT, Q> that) const
 		{
 			// flip fraction rows around for division
 			typedef typename detail::combine<
@@ -335,28 +335,28 @@ namespace units
 			typedef typename detail::sorted<UnsortedNumerator>::type Numerator;
 			typedef typename detail::sorted<UnsortedDenominator>::type
 				Denominator;
-			typedef UnitQuotient<Denominator, Numerator> ResultUnits;
+			typedef unit_quotient<Denominator, Numerator> ResultUnits;
 		
 			auto rawQuantity = raw() / that.raw();
-			return Quantity<decltype(rawQuantity), ResultUnits>(rawQuantity);
+			return quantity<decltype(rawQuantity), ResultUnits>(rawQuantity);
 		}
 	};
 
 	template<typename MulType, typename NumericType, typename Quotient>
-	auto operator*(MulType left, Quantity<NumericType, Quotient> right)
+	auto operator*(MulType left, quantity<NumericType, Quotient> right)
 		-> typename std::enable_if<
 			std::is_arithmetic<MulType>::value,
-			Quantity<NumericType, Quotient>>::type
+			quantity<NumericType, Quotient>>::type
 	{
 		typedef typename Quotient::unit_system UnitEnum;
-		typedef UnitQuotient<UnitProduct<UnitEnum>, UnitProduct<UnitEnum>>
+		typedef unit_quotient<unit_product<UnitEnum>, unit_product<UnitEnum>>
 			EmptyQuotient;
-		typedef Quantity<NumericType, EmptyQuotient> Unitless;
+		typedef quantity<NumericType, EmptyQuotient> Unitless;
 		return Unitless(left) * right;
 	}
 
 	template<typename NumericType, typename UnitType, UnitType... U>
-	using UnitSkeleton = Quantity<NumericType, UnitQuotient<
-		UnitProduct<UnitType, U...>,
-		UnitProduct<UnitType>>>;
+	using unit_base = quantity<NumericType, unit_quotient<
+		unit_product<UnitType, U...>,
+		unit_product<UnitType>>>;
 }
