@@ -205,29 +205,20 @@ namespace detail
 
 namespace unitscxx
 {
-	template<typename UnitEnum, UnitEnum... S>
-	using unit_product = typename detail::sorted<
-		detail::sequence<UnitEnum, S...>>::type;
-
-	template<typename Den, typename Num>
-	struct unit_quotient
-	{
-		typedef Den denominator;
-		typedef Num numerator;
-		typedef typename denominator::value_type unit_system;
-		static_assert(std::is_same<
-			typename denominator::value_type,
-			typename numerator::value_type>::value,
-			"unit_quotient with incompatible unit systems");
-	};
-
-	template<typename NumericType, typename Quotient>
+	template<typename NumericType, typename Numerator, typename Denominator>
 	class quantity
 	{
 		NumericType rawValue;
 	
 	public:
-		typedef Quotient Units;
+		typedef Numerator numerator;
+		typedef Denominator denominator;
+		typedef typename numerator::value_type unit_system;
+		
+		static_assert(std::is_same<
+			typename denominator::value_type,
+			typename numerator::value_type>::value,
+			"quantity with incompatible unit systems");
 	
 		quantity() = default;
 		quantity(const quantity&) = default;
@@ -279,32 +270,36 @@ namespace unitscxx
 			return quantity(raw() * that);
 		}
 	
-		template<typename NT, typename Q>
-		auto operator*(quantity<NT, Q> that) const
+		template<typename NT, typename N, typename D>
+		auto operator*(quantity<NT, N, D> that) const
 		{
-			typedef typename detail::combine<
-				typename Units::denominator,
-				typename Q::denominator>::type CombinedDenominator;
-		
-			typedef typename detail::combine<
-				typename Units::numerator,
-				typename Q::numerator>::type CombinedNumerator;
+			typedef typename detail::combine<numerator, N>::type
+				combined_numerator;
+			
+			typedef typename detail::combine<denominator, D>::type
+				combined_denominator;
 		
 			typedef typename detail::remove_intersection<
-				CombinedNumerator,
-				CombinedDenominator>::type UnsortedNumerator;
+				combined_numerator,
+				combined_denominator>::type unsorted_numerator;
 		
 			typedef typename detail::remove_intersection<
-				CombinedDenominator,
-				CombinedNumerator>::type UnsortedDenominator;
+				combined_denominator,
+				combined_numerator>::type unsorted_denominator;
 		
-			typedef typename detail::sorted<UnsortedNumerator>::type Numerator;
-			typedef typename detail::sorted<UnsortedDenominator>::type
-				Denominator;
-			typedef unit_quotient<Denominator, Numerator> ResultUnits;
+			typedef typename detail::sorted<unsorted_numerator>::type
+				result_numerator;
+			typedef typename detail::sorted<unsorted_denominator>::type
+				result_denominator;
 		
 			auto rawQuantity = raw() * that.raw();
-			return quantity<decltype(rawQuantity), ResultUnits>(rawQuantity);
+					
+			typedef quantity<
+				decltype(rawQuantity),
+				result_numerator,
+				result_denominator> result_quantity;
+		
+			return result_quantity(rawQuantity);
 		}
 	
 		quantity operator/(NumericType that) const
@@ -312,51 +307,68 @@ namespace unitscxx
 			return quantity(raw() / that);
 		}
 	
-		template<typename NT, typename Q>
-		auto operator/(quantity<NT, Q> that) const
+		template<typename NT, typename N, typename D>
+		auto operator/(quantity<NT, N, D> that) const
 		{
 			// flip fraction rows around for division
-			typedef typename detail::combine<
-				typename Units::denominator,
-				typename Q::numerator>::type CombinedDenominator;
-		
-			typedef typename detail::combine<
-				typename Units::numerator,
-				typename Q::denominator>::type CombinedNumerator;
+			typedef typename detail::combine<numerator, D>::type
+				combined_numerator;
+			
+			typedef typename detail::combine<denominator, N>::type
+				combined_denominator;
 		
 			typedef typename detail::remove_intersection<
-				CombinedNumerator,
-				CombinedDenominator>::type UnsortedNumerator;
+				combined_numerator,
+				combined_denominator>::type unsorted_numerator;
 		
 			typedef typename detail::remove_intersection<
-				CombinedDenominator,
-				CombinedNumerator>::type UnsortedDenominator;
+				combined_denominator,
+				combined_numerator>::type unsorted_denominator;
 		
-			typedef typename detail::sorted<UnsortedNumerator>::type Numerator;
-			typedef typename detail::sorted<UnsortedDenominator>::type
-				Denominator;
-			typedef unit_quotient<Denominator, Numerator> ResultUnits;
-		
+			typedef typename detail::sorted<unsorted_numerator>::type
+				result_numerator;
+			typedef typename detail::sorted<unsorted_denominator>::type
+				result_denominator;
+			
 			auto rawQuantity = raw() / that.raw();
-			return quantity<decltype(rawQuantity), ResultUnits>(rawQuantity);
+			
+			typedef quantity<
+				decltype(rawQuantity),
+				result_numerator,
+				result_denominator> result_quantity;
+		
+			return result_quantity(rawQuantity);
 		}
 	};
 
-	template<typename MulType, typename NumericType, typename Quotient>
-	auto operator*(MulType left, quantity<NumericType, Quotient> right)
+	template<typename MulType, typename NT, typename N, typename D>
+	auto operator*(MulType left, quantity<NT, N, D> right)
 		-> typename std::enable_if<
 			std::is_arithmetic<MulType>::value,
-			quantity<NumericType, Quotient>>::type
+			quantity<NT, N, D>>::type
 	{
-		typedef typename Quotient::unit_system UnitEnum;
-		typedef unit_quotient<unit_product<UnitEnum>, unit_product<UnitEnum>>
-			EmptyQuotient;
-		typedef quantity<NumericType, EmptyQuotient> Unitless;
-		return Unitless(left) * right;
+		typedef typename N::value_type unit_system;
+		typedef quantity<NT,
+			detail::sequence<unit_system>,
+			detail::sequence<unit_system>> unitless_quantity;
+		return unitless_quantity(left) * right;
+	}
+
+	template<typename MulType, typename NT, typename N, typename D>
+	auto operator/(MulType left, quantity<NT, N, D> right)
+		-> typename std::enable_if<
+			std::is_arithmetic<MulType>::value,
+			quantity<NT, N, D>>::type
+	{
+		typedef typename N::value_type unit_system;
+		typedef quantity<NT,
+			detail::sequence<unit_system>,
+			detail::sequence<unit_system>> unitless_quantity;
+		return unitless_quantity(left) / right;
 	}
 
 	template<typename NumericType, typename UnitType, UnitType... U>
-	using unit_base = quantity<NumericType, unit_quotient<
-		unit_product<UnitType, U...>,
-		unit_product<UnitType>>>;
+	using unit_base = quantity<NumericType,
+		detail::sequence<UnitType, U...>,
+		detail::sequence<UnitType>>;
 }

@@ -49,5 +49,5 @@ int main()
 	decltype(_N) force = distance * mass / (1.2 * _s * 1.8 * _s);
 	
 	// uncomment for an error
-	// decltype(_N) notForce = mass / distance;
+	decltype(_N) notForce = mass / distance;
 }
