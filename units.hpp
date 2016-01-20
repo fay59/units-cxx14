@@ -1,19 +1,19 @@
 //
 // units.hpp
 // units-cxx14
-// 
+//
 // Copyright (c) 2016 Félix Cloutier
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,6 +23,10 @@
 // SOFTWARE.
 //
 
+#ifndef UNITS_HPP
+#define UNITS_HPP
+
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -209,140 +213,140 @@ namespace unitscxx
 	class quantity
 	{
 		NumericType rawValue;
-	
+
 	public:
 		typedef Numerator numerator;
 		typedef Denominator denominator;
 		typedef typename numerator::value_type unit_system;
-		
+
 		static_assert(std::is_same<
 			typename denominator::value_type,
 			typename numerator::value_type>::value,
 			"quantity with incompatible unit systems");
-	
-		quantity() = default;
-		quantity(const quantity&) = default;
-		quantity(quantity&&) = default;
+
+		constexpr quantity() = default;
+		constexpr quantity(const quantity&) = default;
+		constexpr quantity(quantity&&) = default;
 		quantity& operator=(const quantity&) = default;
 		quantity& operator=(quantity&&) = default;
-	
-		explicit quantity(NumericType rawValue)
+
+		explicit constexpr quantity(NumericType rawValue)
 		: rawValue(rawValue)
 		{
 		}
-	
-		NumericType raw() const { return rawValue; }
-	
-		quantity& operator+=(quantity that) const
+
+		constexpr NumericType raw() const { return rawValue; }
+
+		quantity& operator+=(quantity that)
 		{
-			return *this = *this + that; 
+			return *this = *this + that;
 		}
-	
-		quantity& operator-=(quantity that) const
+
+		quantity& operator-=(quantity that)
 		{
-			return *this = *this - that; 
+			return *this = *this - that;
 		}
-	
-		quantity operator-(quantity that) const
+
+		constexpr quantity operator-(quantity that) const
 		{
 			return quantity(raw() - that.raw());
 		}
-	
-		quantity operator+(quantity that) const
+
+		constexpr quantity operator+(quantity that) const
 		{
 			return quantity(raw() + that.raw());
 		}
-	
+
 		quantity& operator*=(NumericType that)
 		{
 			rawValue *= that;
 			return *this;
 		}
-	
+
 		quantity& operator/=(NumericType that)
 		{
 			rawValue /= that;
 			return *this;
 		}
-	
-		quantity operator*(NumericType that) const
+
+		constexpr quantity operator*(NumericType that) const
 		{
 			return quantity(raw() * that);
 		}
-	
+
 		template<typename NT, typename N, typename D>
-		auto operator*(quantity<NT, N, D> that) const
+		constexpr auto operator*(quantity<NT, N, D> that) const
 		{
 			typedef typename detail::combine<numerator, N>::type
 				combined_numerator;
-			
+
 			typedef typename detail::combine<denominator, D>::type
 				combined_denominator;
-		
+
 			typedef typename detail::remove_intersection<
 				combined_numerator,
 				combined_denominator>::type unsorted_numerator;
-		
+
 			typedef typename detail::remove_intersection<
 				combined_denominator,
 				combined_numerator>::type unsorted_denominator;
-		
+
 			typedef typename detail::sorted<unsorted_numerator>::type
 				result_numerator;
 			typedef typename detail::sorted<unsorted_denominator>::type
 				result_denominator;
-		
+
 			auto rawQuantity = raw() * that.raw();
-					
+
 			typedef quantity<
 				decltype(rawQuantity),
 				result_numerator,
 				result_denominator> result_quantity;
-		
+
 			return result_quantity(rawQuantity);
 		}
-	
-		quantity operator/(NumericType that) const
+
+		constexpr quantity operator/(NumericType that) const
 		{
 			return quantity(raw() / that);
 		}
-	
+
 		template<typename NT, typename N, typename D>
-		auto operator/(quantity<NT, N, D> that) const
+		constexpr auto operator/(quantity<NT, N, D> that) const
 		{
 			// flip fraction rows around for division
 			typedef typename detail::combine<numerator, D>::type
 				combined_numerator;
-			
+
 			typedef typename detail::combine<denominator, N>::type
 				combined_denominator;
-		
+
 			typedef typename detail::remove_intersection<
 				combined_numerator,
 				combined_denominator>::type unsorted_numerator;
-		
+
 			typedef typename detail::remove_intersection<
 				combined_denominator,
 				combined_numerator>::type unsorted_denominator;
-		
+
 			typedef typename detail::sorted<unsorted_numerator>::type
 				result_numerator;
 			typedef typename detail::sorted<unsorted_denominator>::type
 				result_denominator;
-			
+
 			auto rawQuantity = raw() / that.raw();
-			
+
 			typedef quantity<
 				decltype(rawQuantity),
 				result_numerator,
 				result_denominator> result_quantity;
-		
+
 			return result_quantity(rawQuantity);
 		}
 	};
 
 	template<typename MulType, typename NT, typename N, typename D>
-	auto operator*(MulType left, quantity<NT, N, D> right)
+	constexpr auto operator*(MulType left, quantity<NT, N, D> right)
 		-> typename std::enable_if<
 			std::is_arithmetic<MulType>::value,
 			quantity<NT, N, D>>::type
@@ -355,7 +359,7 @@ namespace unitscxx
 	}
 
 	template<typename MulType, typename NT, typename N, typename D>
-	auto operator/(MulType left, quantity<NT, N, D> right)
+	constexpr auto operator/(MulType left, quantity<NT, N, D> right)
 		-> typename std::enable_if<
 			std::is_arithmetic<MulType>::value,
 			quantity<NT, N, D>>::type
@@ -372,3 +376,5 @@ namespace unitscxx
 		detail::sequence<UnitType, U...>,
 		detail::sequence<UnitType>>;
 }
+
+#endif
