@@ -296,14 +296,12 @@ namespace unitscxx
 			typedef typename detail::sorted<unsorted_denominator>::type
 				result_denominator;
 
-			auto rawQuantity = raw() * that.raw();
-
 			typedef quantity<
-				decltype(rawQuantity),
+				decltype(raw() * that.raw()),
 				result_numerator,
 				result_denominator> result_quantity;
 
-			return result_quantity(rawQuantity);
+			return result_quantity(raw() * that.raw());
 		}
 
 		constexpr quantity operator/(NumericType that) const
@@ -334,14 +332,12 @@ namespace unitscxx
 			typedef typename detail::sorted<unsorted_denominator>::type
 				result_denominator;
 
-			auto rawQuantity = raw() / that.raw();
-
 			typedef quantity<
-				decltype(rawQuantity),
+				decltype(raw() / that.raw()),
 				result_numerator,
 				result_denominator> result_quantity;
 
-			return result_quantity(rawQuantity);
+			return result_quantity(raw() / that.raw());
 		}
 	};
 
