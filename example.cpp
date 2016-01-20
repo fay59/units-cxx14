@@ -40,6 +40,7 @@ unit_base<units::meter> _ft(0.3048);
 unit_base<units::second> _s(1);
 unit_base<units::kilogram> _Kg(1);
 auto _N = (_Kg * _m) / (_s * _s);
+auto _Hz = 1 / _s;
 
 int main()
 {

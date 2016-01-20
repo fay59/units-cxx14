@@ -362,7 +362,7 @@ namespace unitscxx
 	constexpr auto operator/(MulType left, quantity<NT, N, D> right)
 		-> typename std::enable_if<
 			std::is_arithmetic<MulType>::value,
-			quantity<NT, N, D>>::type
+			quantity<NT, D, N>>::type
 	{
 		typedef typename N::value_type unit_system;
 		typedef quantity<NT,
