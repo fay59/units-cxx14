@@ -224,6 +224,9 @@ namespace unitscxx
 			typename numerator::value_type>::value,
 			"quantity with incompatible unit systems");
 
+		template<typename NT, typename N, typename D>
+		friend class quantity;
+
 		constexpr quantity() : rawValue{} {};
 		constexpr quantity(const quantity&) = default;
 		constexpr quantity(quantity&&) = default;
