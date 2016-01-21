@@ -349,6 +349,11 @@ namespace unitscxx
 
 			return result_quantity(raw() / that.raw());
 		}
+
+		template<typename N = Numerator, typename D = Denominator,
+			typename = typename std::enable_if<N::size == 0 && D::size == 0>::type>
+		constexpr operator NumericType()
+		{ return raw(); }
 	};
 
 	template<typename MulType, typename NT, typename N, typename D>
