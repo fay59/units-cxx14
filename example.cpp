@@ -35,12 +35,12 @@ enum class units
 template<units U>
 using unit_base = unitscxx::unit_base<double, units, U>;
 
-unit_base<units::meter> _m(1);
-unit_base<units::meter> _ft(0.3048);
-unit_base<units::second> _s(1);
-unit_base<units::kilogram> _Kg(1);
-auto _N = (_Kg * _m) / (_s * _s);
-auto _Hz = 1 / _s;
+constexpr unit_base<units::meter> _m(1);
+constexpr unit_base<units::meter> _ft(0.3048);
+constexpr unit_base<units::second> _s(1);
+constexpr unit_base<units::kilogram> _Kg(1);
+constexpr auto _N = (_Kg * _m) / (_s * _s);
+constexpr auto _Hz = 1 / _s;
 
 int main()
 {
@@ -51,4 +51,11 @@ int main()
 	
 	// uncomment for an error
 	// decltype(_N) notForce = mass / distance;
+	
+	// get the numerical part by dividing the quantity by its unit
+	double squareFeet = area / (_ft * _ft);
+	
+	// mutable unit types
+	decltype(_m)::var mutableDistance = 3.2 * _ft;
+	mutableDistance += distance;
 }

@@ -31,22 +31,23 @@ This example is the same as the one that lives in the example.cpp file.
 	using unit_base = unitscxx::unit_base<double, units, U>;
 	
 	// Create variables that represent each unit that you want to use in
-	// calculations.
-	unit_base<units::meter> _m(1);
-	unit_base<units::second> _s(1);
-	unit_base<units::kilogram> _Kg(1);
+	// calculations. Constexpr means that you can easily have them in a header.
+	constexpr unit_base<units::meter> _m(1);
+	constexpr unit_base<units::second> _s(1);
+	constexpr unit_base<units::kilogram> _Kg(1);
 	
 	// The parameter is the "numeric part" of the variable. For instance, you
 	// can define a foot as being 0.3048 meters.
-	unit_base<units::meter> _ft(0.3048);
+	constexpr unit_base<units::meter> _ft(0.3048);
 	
 	// Units can also be derived from other units easily.
-	auto _N = (_Kg * _m) / (_s * _s);
+	constexpr auto _N = (_Kg * _m) / (_s * _s);
+	constexpr auto _Hz = 1 / _s;
 
 	int main()
 	{
 		// The simplest and cleanest way to reference a unit type is to use
-		// decltype.
+		// decltype...
 		
 		// all good
 		decltype(_m) distance = 12.5 * _m;
@@ -56,6 +57,14 @@ This example is the same as the one that lives in the example.cpp file.
 	
 		// bad
 		decltype(_N) notForce = mass / distance;
+		
+		// ... but decltype on a constexpr is a const type. This may or may not
+		// be a problem to you: since multiplications and divisions return
+		// values of a different type, chances are that you'll need a new
+		// variable anyway.
+		// If you need a mutable variable, you can use the ::var type member:
+		decltype(_m)::var mutableDistance = 3.2 * _ft;
+		mutableDistance += distance;
 	}
 
 ## License

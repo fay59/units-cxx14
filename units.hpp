@@ -215,6 +215,7 @@ namespace unitscxx
 		NumericType rawValue;
 
 	public:
+		typedef quantity var;
 		typedef Numerator numerator;
 		typedef Denominator denominator;
 		typedef typename numerator::value_type unit_system;
