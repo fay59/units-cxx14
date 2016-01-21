@@ -224,18 +224,19 @@ namespace unitscxx
 			typename numerator::value_type>::value,
 			"quantity with incompatible unit systems");
 
-		constexpr quantity() = default;
+		template<typename NT, typename N, typename D>
+		friend class quantity;
+
+		constexpr quantity() : rawValue{} {};
 		constexpr quantity(const quantity&) = default;
 		constexpr quantity(quantity&&) = default;
 		quantity& operator=(const quantity&) = default;
 		quantity& operator=(quantity&&) = default;
 
-		explicit constexpr quantity(NumericType rawValue)
-		: rawValue(rawValue)
+		explicit constexpr quantity(NumericType val)
+			: rawValue(val)
 		{
 		}
-
-		constexpr NumericType raw() const { return rawValue; }
 
 		quantity& operator+=(quantity that)
 		{
@@ -249,22 +250,22 @@ namespace unitscxx
 
 		constexpr quantity operator+(quantity that) const
 		{
-			return quantity(raw() + that.raw());
+			return quantity(rawValue + that.rawValue);
 		}
 
 		constexpr quantity operator-(quantity that) const
 		{
-			return quantity(raw() - that.raw());
+			return quantity(rawValue - that.rawValue);
 		}
 
 		constexpr quantity operator+() const
 		{
-			return quantity(+raw());
+			return quantity(+rawValue);
 		}
 
 		constexpr quantity operator-() const
 		{
-			return quantity(-raw());
+			return quantity(-rawValue);
 		}
 
 		quantity& operator*=(NumericType that)
@@ -281,7 +282,7 @@ namespace unitscxx
 
 		constexpr quantity operator*(NumericType that) const
 		{
-			return quantity(raw() * that);
+			return quantity(rawValue * that);
 		}
 
 		template<typename NT, typename N, typename D>
@@ -307,16 +308,16 @@ namespace unitscxx
 				result_denominator;
 
 			typedef quantity<
-				decltype(raw() * that.raw()),
+				decltype(rawValue * that.rawValue),
 				result_numerator,
 				result_denominator> result_quantity;
 
-			return result_quantity(raw() * that.raw());
+			return result_quantity(rawValue * that.rawValue);
 		}
 
 		constexpr quantity operator/(NumericType that) const
 		{
-			return quantity(raw() / that);
+			return quantity(rawValue / that);
 		}
 
 		template<typename NT, typename N, typename D>
@@ -343,11 +344,18 @@ namespace unitscxx
 				result_denominator;
 
 			typedef quantity<
-				decltype(raw() / that.raw()),
+				decltype(rawValue / that.rawValue),
 				result_numerator,
 				result_denominator> result_quantity;
 
-			return result_quantity(raw() / that.raw());
+			return result_quantity(rawValue / that.rawValue);
+		}
+
+		template<typename N = Numerator, typename D = Denominator, typename
+			= typename std::enable_if<N::size == 0 && D::size == 0>::type>
+		constexpr operator NumericType()
+		{
+			return rawValue;
 		}
 	};
 
