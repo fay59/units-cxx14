@@ -247,14 +247,24 @@ namespace unitscxx
 			return *this = *this - that;
 		}
 
+		constexpr quantity operator+(quantity that) const
+		{
+			return quantity(raw() + that.raw());
+		}
+
 		constexpr quantity operator-(quantity that) const
 		{
 			return quantity(raw() - that.raw());
 		}
 
-		constexpr quantity operator+(quantity that) const
+		constexpr quantity operator+() const
 		{
-			return quantity(raw() + that.raw());
+			return quantity(+raw());
+		}
+
+		constexpr quantity operator-() const
+		{
+			return quantity(-raw());
 		}
 
 		quantity& operator*=(NumericType that)
