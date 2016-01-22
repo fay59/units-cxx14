@@ -17,7 +17,9 @@ of the identifier (so `m_` instead of `m_`).
 
 ## Example
 
-This example is the same as the one that lives in the example.cpp file.
+This is how you would define units from scratch, if you don't want to use
+siunits.hpp (or usunits.hpp). The example.cpp file has examples for how to use
+US units.
 
 ```C++
 #include "units.hpp"
