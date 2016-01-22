@@ -27,6 +27,7 @@
 #define UNITS_HPP
 
 #include <cstddef>
+#include <ratio>
 #include <type_traits>
 #include <utility>
 
@@ -351,6 +352,18 @@ namespace unitscxx
 
 			return result_quantity(rawValue / that.rawValue);
 		}
+		
+		template<intmax_t N, intmax_t D>
+		constexpr quantity operator*(std::ratio<N, D>) const
+		{
+			return (*this) * N / D;
+		}
+		
+		template<intmax_t N, intmax_t D>
+		constexpr quantity operator/(std::ratio<N, D>) const
+		{
+			return (*this) / N * D;
+		}
 
 		template<typename N = Numerator, typename D = Denominator, typename
 			= typename std::enable_if<N::size == 0 && D::size == 0>::type>
@@ -384,6 +397,20 @@ namespace unitscxx
 			detail::sequence<unit_system>,
 			detail::sequence<unit_system>> unitless_quantity;
 		return unitless_quantity(left) / right;
+	}
+	
+	template<intmax_t RN, intmax_t RD, typename QNT, typename QN, typename QD>
+	constexpr quantity<QNT, QN, QD> operator*(
+		std::ratio<RN, RD> left, quantity<QNT, QN, QD> right)
+	{
+		return right * left;
+	}
+	
+	template<intmax_t RN, intmax_t RD, typename QNT, typename QN, typename QD>
+	constexpr quantity<QNT, QD, QN> operator/(
+		std::ratio<RN, RD> left, quantity<QNT, QN, QD> right)
+	{
+		return (1 / right) * left;
 	}
 
 	template<typename NumericType, typename UnitType, UnitType... U>
