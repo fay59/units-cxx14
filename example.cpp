@@ -35,27 +35,27 @@ enum class units
 template<units U>
 using unit_base = unitscxx::unit_base<double, units, U>;
 
-constexpr unit_base<units::meter> _m(1);
-constexpr unit_base<units::meter> _ft(0.3048);
-constexpr unit_base<units::second> _s(1);
-constexpr unit_base<units::kilogram> _Kg(1);
-constexpr auto _N = (_Kg * _m) / (_s * _s);
-constexpr auto _Hz = 1 / _s;
+constexpr unit_base<units::meter> m_(1);
+constexpr unit_base<units::meter> ft_(0.3048);
+constexpr unit_base<units::second> s_(1);
+constexpr unit_base<units::kilogram> Kg_(1);
+constexpr auto N_ = (Kg_ * m_) / (s_ * s_);
+constexpr auto Hz_ = 1 / s_;
 
 int main()
 {
-	decltype(_m) distance = 12.5 * _m;
-	decltype(_m * _m) area = 2 * _ft * distance;
-	decltype(_Kg) mass = 18 * _Kg;
-	decltype(_N) force = distance * mass / (1.2 * _s * 1.8 * _s);
+	decltype(m_) distance = 12.5 * m_;
+	decltype(m_ * m_) area = 2 * ft_ * distance;
+	decltype(Kg_) mass = 18 * Kg_;
+	decltype(N_) force = distance * mass / (1.2 * s_ * 1.8 * s_);
 	
 	// uncomment for an error
-	// decltype(_N) notForce = mass / distance;
+	// decltype(N_) notForce = mass / distance;
 	
 	// get the numerical part by dividing the quantity by its unit
-	double squareFeet = area / (_ft * _ft);
+	double squareFeet = area / (ft_ * ft_);
 	
 	// mutable unit types
-	decltype(_m)::var mutableDistance = 3.2 * _ft;
+	decltype(m_)::var mutableDistance = 3.2 * ft_;
 	mutableDistance += distance;
 }
