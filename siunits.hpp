@@ -108,7 +108,7 @@ namespace si
 	constexpr auto deg = UNITSCXX_SI_ARITHMETIC_TYPE(180) / M_PI;
 	constexpr auto ha = detail::hm * detail::hm;
 	constexpr auto L = detail::dm * detail::dm * detail::dm;
-	constexpr auto t = std::mega() * kg;
+	constexpr auto t = std::kilo() * kg;
 	constexpr auto au = 1.496e11 * m;
 }
 }

@@ -13,7 +13,7 @@ classes.
 Since C++ reserves names starting with an underscore in the global namespace
 (and *all* names starting with an underscore followed by an uppercase letter
 in any namespace) per §17.6.4.3.2, these examples put the underscore at the end
-of the identifier (so `m_` instead of `m_`).
+of the identifier (so `m_` instead of `_m`).
 
 ## Example
 
