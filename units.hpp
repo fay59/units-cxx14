@@ -377,10 +377,9 @@ namespace unitscxx
 		}
 	};
 
-	template<typename MulType, typename NT, typename N, typename D>
-	constexpr auto operator*(MulType left, quantity<NT, N, D> right)
-		-> std::enable_if_t<std::is_arithmetic<MulType>::value,
-			quantity<NT, N, D>>
+	template<typename MulType, typename NT, typename N, typename D, typename =
+		typename std::enable_if<std::is_arithmetic<MulType>::value>::type>
+	constexpr quantity<NT, N, D> operator*(MulType left, quantity<NT, N, D> right)
 	{
 		using unit_system = typename N::value_type;
 		using unitless_quantity = quantity<NT,
@@ -389,10 +388,9 @@ namespace unitscxx
 		return unitless_quantity(left) * right;
 	}
 
-	template<typename MulType, typename NT, typename N, typename D>
-	constexpr auto operator/(MulType left, quantity<NT, N, D> right)
-		-> std::enable_if_t<std::is_arithmetic<MulType>::value,
-			quantity<NT, D, N>>
+	template<typename MulType, typename NT, typename N, typename D, typename =
+		typename std::enable_if<std::is_arithmetic<MulType>::value>::type>
+	constexpr quantity<NT, D, N> operator/(MulType left, quantity<NT, N, D> right)
 	{
 		using unit_system = typename N::value_type;
 		using unitless_quantity = quantity<NT,
