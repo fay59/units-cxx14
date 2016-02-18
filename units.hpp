@@ -39,7 +39,7 @@ namespace detail
 	template<typename T, T... S>
 	struct sequence
 	{
-		typedef T value_type;
+		using value_type = T;
 		static constexpr size_t size = sizeof...(S);
 	};
 
@@ -50,9 +50,9 @@ namespace detail
 	template<typename IntegerType, IntegerType I, IntegerType S1,
 		IntegerType... Ss>
 	struct sequence_contains_type<IntegerType, I, S1, Ss...>
-		: std::conditional<I == S1,
-			std::true_type,
-			typename sequence_contains_type<IntegerType, I, Ss...>::type>::type
+	: std::conditional_t<I == S1,
+		std::true_type,
+		typename sequence_contains_type<IntegerType, I, Ss...>::type>
 	{
 	};
 
@@ -69,96 +69,109 @@ namespace detail
 
 #pragma mark - Combine sequences
 	template<typename Seq1, typename Seq2>
-	struct combine;
+	struct combine_;
 
 	template<typename IntegerType, IntegerType... S1, IntegerType... S2>
-	struct combine<sequence<IntegerType, S1...>, sequence<IntegerType, S2...>>
+	struct combine_<sequence<IntegerType, S1...>, sequence<IntegerType, S2...>>
 	{
-		typedef sequence<IntegerType, S1..., S2...> type;
+		using type = sequence<IntegerType, S1..., S2...>;
 	};
+
+	template<typename Seq1, typename Seq2>
+	using combine = typename combine_<Seq1, Seq2>::type;
 
 	template<typename Seq1, typename Seq2>
 	constexpr auto combine_sequences(Seq1, Seq2)
 	{
-		return typename combine<Seq1, Seq2>::type{};
+		return combine<Seq1, Seq2>{};
 	}
 
 #pragma mark - Remove an item
 	template<typename Seq, typename IntegerType, IntegerType I>
-	struct left_of;
+	struct left_of_;
 
 	template<typename IntegerType, IntegerType I>
-	struct left_of<sequence<IntegerType>, IntegerType, I>
+	struct left_of_<sequence<IntegerType>, IntegerType, I>
 	{
-		typedef sequence<IntegerType> type;
+		using type = sequence<IntegerType>;
 	};
 
 	template<typename IntegerType, IntegerType I, IntegerType S1,
 		IntegerType... Ss>
-	struct left_of<sequence<IntegerType, S1, Ss...>, IntegerType, I>
+	struct left_of_<sequence<IntegerType, S1, Ss...>, IntegerType, I>
 	{
-		typedef typename std::conditional<I == S1,
+		using type = std::conditional_t<I == S1,
 			sequence<IntegerType>,
-			typename combine<
+			combine<
 				sequence<IntegerType, S1>,
-				typename left_of<
+				typename left_of_<
 					sequence<IntegerType, Ss...>,
-					IntegerType, I>::type>::type>::type type;
+					IntegerType, I>::type>>;
 	};
 
 	template<typename Seq, typename IntegerType, IntegerType I>
-	struct right_of;
+	using left_of = typename left_of_<Seq, IntegerType, I>::type;
+
+	template<typename Seq, typename IntegerType, IntegerType I>
+	struct right_of_;
 
 	template<typename IntegerType, IntegerType I>
-	struct right_of<sequence<IntegerType>, IntegerType, I>
+	struct right_of_<sequence<IntegerType>, IntegerType, I>
 	{
-		typedef sequence<IntegerType> type;
+		using type = sequence<IntegerType>;
 	};
 
 	template<typename IntegerType, IntegerType I, IntegerType S1,
 		IntegerType... Ss>
-	struct right_of<sequence<IntegerType, S1, Ss...>, IntegerType, I>
+	struct right_of_<sequence<IntegerType, S1, Ss...>, IntegerType, I>
 	{
-		typedef typename std::conditional<I == S1,
+		using type = std::conditional_t<I == S1,
 			sequence<IntegerType, Ss...>,
-			typename right_of<sequence<IntegerType, Ss...>,
-		IntegerType, I>::type>::type type;
+			typename right_of_<sequence<IntegerType, Ss...>, IntegerType, I>::type
+		>;
 	};
 
 	template<typename Seq, typename IntegerType, IntegerType I>
-	struct removed_from
+	using right_of = typename right_of_<Seq, IntegerType, I>::type;
+
+	template<typename Seq, typename IntegerType, IntegerType I>
+	struct removed_from_
 	{
-		typedef typename combine<
-			typename left_of<Seq, IntegerType, I>::type,
-			typename right_of<Seq, IntegerType, I>::type>::type type;
+		using type = combine<left_of<Seq, IntegerType, I>,
+		                    right_of<Seq, IntegerType, I>>;
 	};
+	template<typename Seq, typename IntegerType, IntegerType I>
+	using removed_from = typename removed_from_<Seq, IntegerType, I>::type;
 
 #pragma mark - Remove identical terms
 	template<typename Seq1, typename Seq2>
-	struct remove_intersection;
+	struct remove_intersection_;
 
 	template<typename IntegerType1, IntegerType1... Ones, typename IntegerType2>
-	struct remove_intersection<
+	struct remove_intersection_<
 		sequence<IntegerType1, Ones...>,
 		sequence<IntegerType2>>
 	{
-		typedef sequence<IntegerType1, Ones...> type;
+		using type = sequence<IntegerType1, Ones...>;
 	};
 
 	template<typename IntegerType1, IntegerType1... Ones, typename IntegerType2,
 		IntegerType2 Two, IntegerType2... Twos>
-	struct remove_intersection<
+	struct remove_intersection_<
 		sequence<IntegerType1, Ones...>,
 		sequence<IntegerType2, Two, Twos...>>
 	{
-		typedef typename removed_from<
-			typename remove_intersection<
+		using type = removed_from<
+			typename remove_intersection_<
 				sequence<IntegerType1, Ones...>,
 				sequence<IntegerType2, Twos...>
 			>::type,
 			IntegerType2, Two
-		>::type type;
+		>;
 	};
+
+	template<typename Seq1, typename Seq2>
+	using remove_intersection = typename remove_intersection_<Seq1, Seq2>::type;
 
 #pragma mark - Sort a sequence
 	template<typename Sequence>
@@ -179,33 +192,35 @@ namespace detail
 	};
 
 	template<typename Sequence>
-	struct sorted;
+	struct sorted_;
 
 	template<typename IntegerType>
-	struct sorted<sequence<IntegerType>>
+	struct sorted_<sequence<IntegerType>>
 	{
-		typedef sequence<IntegerType> type;
+		using type = sequence<IntegerType>;
 	};
 
 	template<typename IntegerType, IntegerType S1>
-	struct sorted<sequence<IntegerType, S1>>
+	struct sorted_<sequence<IntegerType, S1>>
 	{
-		typedef sequence<IntegerType, S1> type;
+		using type = sequence<IntegerType, S1>;
 	};
 
 	template<typename IntegerType, IntegerType S1, IntegerType... Ss>
-	struct sorted<sequence<IntegerType, S1, Ss...>>
+	struct sorted_<sequence<IntegerType, S1, Ss...>>
 	{
 	private:
-		typedef sequence<IntegerType, S1, Ss...> Seq;
+		using Seq = sequence<IntegerType, S1, Ss...>;
 		static constexpr IntegerType Max = sequence_max<Seq>::value;
 
 	public:
-		typedef typename combine<
-			typename sorted<
-				typename removed_from<Seq, IntegerType, Max>::type>::type,
-			sequence<IntegerType, Max>>::type type;
+		using type = combine<
+			typename sorted_<removed_from<Seq, IntegerType, Max>>::type,
+			sequence<IntegerType, Max>>;
 	};
+
+	template<typename Sequence>
+	using sorted = typename sorted_<Sequence>::type;
 }
 
 namespace unitscxx
@@ -216,14 +231,13 @@ namespace unitscxx
 		NumericType rawValue;
 
 	public:
-		typedef quantity var;
-		typedef Numerator numerator;
-		typedef Denominator denominator;
-		typedef typename numerator::value_type unit_system;
+		using var = quantity;
+		using numerator = Numerator;
+		using denominator = Denominator;
+		using unit_system = typename numerator::value_type;
 
-		static_assert(std::is_same<
-			typename denominator::value_type,
-			typename numerator::value_type>::value,
+		static_assert(std::is_same<unit_system,
+			typename denominator::value_type>::value,
 			"quantity with incompatible unit systems");
 
 		template<typename NT, typename N, typename D>
@@ -290,29 +304,24 @@ namespace unitscxx
 		template<typename NT, typename N, typename D>
 		constexpr auto operator*(quantity<NT, N, D> that) const
 		{
-			typedef typename detail::combine<numerator, N>::type
-				combined_numerator;
+			using combined_numerator   = detail::combine<numerator, N>;
+			using combined_denominator = detail::combine<denominator, D>;
 
-			typedef typename detail::combine<denominator, D>::type
-				combined_denominator;
-
-			typedef typename detail::remove_intersection<
+			using unsorted_numerator   = detail::remove_intersection<
 				combined_numerator,
-				combined_denominator>::type unsorted_numerator;
+				combined_denominator>;
 
-			typedef typename detail::remove_intersection<
+			using unsorted_denominator = detail::remove_intersection<
 				combined_denominator,
-				combined_numerator>::type unsorted_denominator;
+				combined_numerator>;
 
-			typedef typename detail::sorted<unsorted_numerator>::type
-				result_numerator;
-			typedef typename detail::sorted<unsorted_denominator>::type
-				result_denominator;
+			using result_numerator   = detail::sorted<unsorted_numerator>;
+			using result_denominator = detail::sorted<unsorted_denominator>;
 
-			typedef quantity<
+			using result_quantity = quantity<
 				decltype(rawValue * that.rawValue),
 				result_numerator,
-				result_denominator> result_quantity;
+				result_denominator>;
 
 			return result_quantity(rawValue * that.rawValue);
 		}
@@ -326,29 +335,24 @@ namespace unitscxx
 		constexpr auto operator/(quantity<NT, N, D> that) const
 		{
 			// flip fraction rows around for division
-			typedef typename detail::combine<numerator, D>::type
-				combined_numerator;
+			using combined_numerator   = detail::combine<numerator, D>;
+			using combined_denominator = detail::combine<denominator, N>;
 
-			typedef typename detail::combine<denominator, N>::type
-				combined_denominator;
-
-			typedef typename detail::remove_intersection<
+			using unsorted_numerator   = detail::remove_intersection<
 				combined_numerator,
-				combined_denominator>::type unsorted_numerator;
+				combined_denominator>;
 
-			typedef typename detail::remove_intersection<
+			using unsorted_denominator = detail::remove_intersection<
 				combined_denominator,
-				combined_numerator>::type unsorted_denominator;
+				combined_numerator>;
 
-			typedef typename detail::sorted<unsorted_numerator>::type
-				result_numerator;
-			typedef typename detail::sorted<unsorted_denominator>::type
-				result_denominator;
+			using result_numerator   = detail::sorted<unsorted_numerator>;
+			using result_denominator = detail::sorted<unsorted_denominator>;
 
-			typedef quantity<
+			using result_quantity = quantity<
 				decltype(rawValue / that.rawValue),
 				result_numerator,
-				result_denominator> result_quantity;
+				result_denominator>;
 
 			return result_quantity(rawValue / that.rawValue);
 		}
@@ -366,36 +370,32 @@ namespace unitscxx
 		}
 
 		template<typename N = Numerator, typename D = Denominator, typename
-			= typename std::enable_if<N::size == 0 && D::size == 0>::type>
+			= std::enable_if_t<N::size == 0 && D::size == 0>>
 		constexpr operator NumericType()
 		{
 			return rawValue;
 		}
 	};
 
-	template<typename MulType, typename NT, typename N, typename D>
-	constexpr auto operator*(MulType left, quantity<NT, N, D> right)
-		-> typename std::enable_if<
-			std::is_arithmetic<MulType>::value,
-			quantity<NT, N, D>>::type
+	template<typename MulType, typename NT, typename N, typename D, typename =
+		typename std::enable_if<std::is_arithmetic<MulType>::value>::type>
+	constexpr quantity<NT, N, D> operator*(MulType left, quantity<NT, N, D> right)
 	{
-		typedef typename N::value_type unit_system;
-		typedef quantity<NT,
+		using unit_system = typename N::value_type;
+		using unitless_quantity = quantity<NT,
 			detail::sequence<unit_system>,
-			detail::sequence<unit_system>> unitless_quantity;
+			detail::sequence<unit_system>>;
 		return unitless_quantity(left) * right;
 	}
 
-	template<typename MulType, typename NT, typename N, typename D>
-	constexpr auto operator/(MulType left, quantity<NT, N, D> right)
-		-> typename std::enable_if<
-			std::is_arithmetic<MulType>::value,
-			quantity<NT, D, N>>::type
+	template<typename MulType, typename NT, typename N, typename D, typename =
+		typename std::enable_if<std::is_arithmetic<MulType>::value>::type>
+	constexpr quantity<NT, D, N> operator/(MulType left, quantity<NT, N, D> right)
 	{
-		typedef typename N::value_type unit_system;
-		typedef quantity<NT,
+		using unit_system = typename N::value_type;
+		using unitless_quantity = quantity<NT,
 			detail::sequence<unit_system>,
-			detail::sequence<unit_system>> unitless_quantity;
+			detail::sequence<unit_system>>;
 		return unitless_quantity(left) / right;
 	}
 	

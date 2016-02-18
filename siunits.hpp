@@ -26,6 +26,7 @@
 #ifndef SIUNITS_HPP
 #define SIUNITS_HPP
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <ratio>
 #include "units.hpp"
@@ -92,7 +93,7 @@ namespace si
 	{
 		return celsiusTemperature * K + Czero;
 	}
-	
+
 	constexpr UNITSCXX_SI_ARITHMETIC_TYPE K2C(decltype(K) kelvinTemperature)
 	{
 		return (kelvinTemperature - Czero) / K;
@@ -105,7 +106,7 @@ namespace si
 		constexpr auto hm = std::hecto() * m;
 	}
 	
-	constexpr auto deg = UNITSCXX_SI_ARITHMETIC_TYPE(180) / M_PI;
+	constexpr auto deg = UNITSCXX_SI_ARITHMETIC_TYPE(M_PI / 180);
 	constexpr auto ha = detail::hm * detail::hm;
 	constexpr auto L = detail::dm * detail::dm * detail::dm;
 	constexpr auto t = std::kilo() * kg;
