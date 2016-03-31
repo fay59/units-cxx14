@@ -383,6 +383,24 @@ namespace unitscxx
 			return (*this) / N * D;
 		}
 
+                constexpr bool operator==(quantity that) const
+                { return rawValue == that.rawValue; }
+
+                constexpr bool operator!=(quantity that) const
+                { return rawValue != that.rawValue; }
+
+                constexpr bool operator<(quantity that) const
+                { return rawValue < that.rawValue; }
+
+                constexpr bool operator>(quantity that) const
+                { return rawValue > that.rawValue; }
+
+                constexpr bool operator<=(quantity that) const
+                { return rawValue <= that.rawValue; }
+
+                constexpr bool operator>=(quantity that) const
+                { return rawValue >= that.rawValue; }
+
 		template<typename N = Numerator, typename D = Denominator, typename
 			= std::enable_if_t<N::size == 0 && D::size == 0>>
 		constexpr operator NumericType()
