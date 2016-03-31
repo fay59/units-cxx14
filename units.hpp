@@ -284,6 +284,20 @@ namespace unitscxx
 			return quantity(-rawValue);
 		}
 
+		template<typename N = Numerator, typename D = Denominator, typename
+                        = typename std::enable_if<N::size == 0 && D::size == 0>::type>
+                constexpr auto operator+(NumericType that) const
+                {
+                        return quantity<NumericType, N, D>(rawValue + that);
+                }
+
+                template<typename N = Numerator, typename D = Denominator, typename
+                        = typename std::enable_if<N::size == 0 && D::size == 0>::type>
+                constexpr auto operator-(NumericType that) const
+                {
+                        return quantity<NumericType, N, D>(rawValue - that);
+                }
+
 		quantity& operator*=(NumericType that)
 		{
 			rawValue *= that;
