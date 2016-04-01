@@ -285,18 +285,18 @@ namespace unitscxx
 		}
 
 		template<typename N = Numerator, typename D = Denominator, typename
-                        = typename std::enable_if<N::size == 0 && D::size == 0>::type>
-                constexpr auto operator+(NumericType that) const
-                {
-                        return quantity<NumericType, N, D>(rawValue + that);
-                }
+			= typename std::enable_if<N::size == 0 && D::size == 0>::type>
+		constexpr auto operator+(NumericType that) const
+		{
+			return quantity<NumericType, N, D>(rawValue + that);
+		}
 
-                template<typename N = Numerator, typename D = Denominator, typename
-                        = typename std::enable_if<N::size == 0 && D::size == 0>::type>
-                constexpr auto operator-(NumericType that) const
-                {
-                        return quantity<NumericType, N, D>(rawValue - that);
-                }
+		template<typename N = Numerator, typename D = Denominator, typename
+			= typename std::enable_if<N::size == 0 && D::size == 0>::type>
+		constexpr auto operator-(NumericType that) const
+		{
+			return quantity<NumericType, N, D>(rawValue - that);
+		}
 
 		quantity& operator*=(NumericType that)
 		{
@@ -370,36 +370,48 @@ namespace unitscxx
 
 			return result_quantity(rawValue / that.rawValue);
 		}
-		
+
 		template<intmax_t N, intmax_t D>
 		constexpr quantity operator*(std::ratio<N, D>) const
 		{
 			return (*this) * N / D;
 		}
-		
+
 		template<intmax_t N, intmax_t D>
 		constexpr quantity operator/(std::ratio<N, D>) const
 		{
 			return (*this) / N * D;
 		}
 
-                constexpr bool operator==(quantity that) const
-                { return rawValue == that.rawValue; }
+		constexpr bool operator==(quantity that) const
+		{
+			return rawValue == that.rawValue;
+		}
 
-                constexpr bool operator!=(quantity that) const
-                { return rawValue != that.rawValue; }
+		constexpr bool operator!=(quantity that) const
+		{
+			return rawValue != that.rawValue;
+		}
 
-                constexpr bool operator<(quantity that) const
-                { return rawValue < that.rawValue; }
+		constexpr bool operator<(quantity that) const
+		{
+			return rawValue < that.rawValue;
+		}
 
-                constexpr bool operator>(quantity that) const
-                { return rawValue > that.rawValue; }
+		constexpr bool operator>(quantity that) const
+		{
+			return rawValue > that.rawValue;
+		}
 
-                constexpr bool operator<=(quantity that) const
-                { return rawValue <= that.rawValue; }
+		constexpr bool operator<=(quantity that) const
+		{
+			return rawValue <= that.rawValue;
+		}
 
-                constexpr bool operator>=(quantity that) const
-                { return rawValue >= that.rawValue; }
+		constexpr bool operator>=(quantity that) const
+		{
+			return rawValue >= that.rawValue;
+		}
 
 		template<typename N = Numerator, typename D = Denominator, typename
 			= std::enable_if_t<N::size == 0 && D::size == 0>>
@@ -430,14 +442,14 @@ namespace unitscxx
 			detail::sequence<unit_system>>;
 		return unitless_quantity(left) / right;
 	}
-	
+
 	template<intmax_t RN, intmax_t RD, typename QNT, typename QN, typename QD>
 	constexpr quantity<QNT, QN, QD> operator*(
 		std::ratio<RN, RD> left, quantity<QNT, QN, QD> right)
 	{
 		return right * left;
 	}
-	
+
 	template<intmax_t RN, intmax_t RD, typename QNT, typename QN, typename QD>
 	constexpr quantity<QNT, QD, QN> operator/(
 		std::ratio<RN, RD> left, quantity<QNT, QN, QD> right)
