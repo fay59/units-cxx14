@@ -457,6 +457,20 @@ namespace unitscxx
 		return (1 / right) * left;
 	}
 
+	template<typename NT, typename N, typename D, typename
+		= typename std::enable_if<N::size == 0 && D::size == 0>::type>
+	constexpr auto operator+(NT lhs, quantity<NT, N, D> rhs)
+	{
+		return quantity<NT, N, D>(lhs + static_cast<NT>(rhs));
+	}
+
+	template<typename NT, typename N, typename D, typename
+		= typename std::enable_if<N::size == 0 && D::size == 0>::type>
+	constexpr auto operator-(NT lhs, quantity<NT, N, D> rhs)
+	{
+		return quantity<NT, N, D>(lhs - static_cast<NT>(rhs));
+	}
+
 	template<typename NumericType, typename UnitType, UnitType... U>
 	using unit_base = quantity<NumericType,
 		detail::sequence<UnitType, U...>,
