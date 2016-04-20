@@ -254,24 +254,30 @@ namespace unitscxx
 		{
 		}
 
-		quantity& operator+=(quantity that)
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		auto& operator+=(quantity<NT, Numerator, Denominator> that)
 		{
 			return *this = *this + that;
 		}
 
-		quantity& operator-=(quantity that)
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		auto& operator-=(quantity<NT, Numerator, Denominator> that)
 		{
 			return *this = *this - that;
 		}
 
-		constexpr quantity operator+(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr auto operator+(quantity<NT, Numerator, Denominator> that) const
 		{
-			return quantity(rawValue + that.rawValue);
+			using ResNT = decltype(rawValue + that.rawValue);
+			return quantity<ResNT, Numerator, Denominator>(rawValue + that.rawValue);
 		}
 
-		constexpr quantity operator-(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr auto operator-(quantity<NT, Numerator, Denominator> that) const
 		{
-			return quantity(rawValue - that.rawValue);
+			using ResNT = decltype(rawValue - that.rawValue);
+			return quantity<ResNT, Numerator, Denominator>(rawValue - that.rawValue);
 		}
 
 		constexpr quantity operator+() const
@@ -284,35 +290,41 @@ namespace unitscxx
 			return quantity(-rawValue);
 		}
 
-		template<typename N = Numerator, typename D = Denominator, typename
-			= typename std::enable_if<N::size == 0 && D::size == 0>::type>
-		constexpr auto operator+(NumericType that) const
+		template<typename NT, typename N = Numerator, typename D = Denominator, typename =
+			std::enable_if_t<N::size == 0 && D::size == 0 && std::is_arithmetic<NT>::value>>
+		constexpr auto operator+(NT that) const
 		{
-			return quantity<NumericType, N, D>(rawValue + that);
+			using ResNT = decltype(rawValue + that);
+			return quantity<ResNT, N, D>(rawValue + that);
 		}
 
-		template<typename N = Numerator, typename D = Denominator, typename
-			= typename std::enable_if<N::size == 0 && D::size == 0>::type>
-		constexpr auto operator-(NumericType that) const
+		template<typename NT, typename N = Numerator, typename D = Denominator, typename =
+			std::enable_if_t<N::size == 0 && D::size == 0 && std::is_arithmetic<NT>::value>>
+		constexpr auto operator-(NT that) const
 		{
-			return quantity<NumericType, N, D>(rawValue - that);
+			using ResNT = decltype(rawValue - that);
+			return quantity<ResNT, N, D>(rawValue - that);
 		}
 
-		quantity& operator*=(NumericType that)
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		quantity& operator*=(NT that)
 		{
 			rawValue *= that;
 			return *this;
 		}
 
-		quantity& operator/=(NumericType that)
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		quantity& operator/=(NT that)
 		{
 			rawValue /= that;
 			return *this;
 		}
 
-		constexpr quantity operator*(NumericType that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr auto operator*(NT that) const
 		{
-			return quantity(rawValue * that);
+			using ResNT = decltype(rawValue * that);
+			return quantity<ResNT, Numerator, Denominator>(rawValue * that);
 		}
 
 		template<typename NT, typename N, typename D>
@@ -340,9 +352,11 @@ namespace unitscxx
 			return result_quantity(rawValue * that.rawValue);
 		}
 
-		constexpr quantity operator/(NumericType that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr auto operator/(NT that) const
 		{
-			return quantity(rawValue / that);
+			using ResNT = decltype(rawValue / that);
+			return quantity<ResNT, Numerator, Denominator>(rawValue / that);
 		}
 
 		template<typename NT, typename N, typename D>
@@ -372,49 +386,55 @@ namespace unitscxx
 		}
 
 		template<intmax_t N, intmax_t D>
-		constexpr quantity operator*(std::ratio<N, D>) const
+		constexpr auto operator*(std::ratio<N, D>) const
 		{
 			return (*this) * N / D;
 		}
 
 		template<intmax_t N, intmax_t D>
-		constexpr quantity operator/(std::ratio<N, D>) const
+		constexpr auto operator/(std::ratio<N, D>) const
 		{
 			return (*this) / N * D;
 		}
 
-		constexpr bool operator==(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr bool operator==(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue == that.rawValue;
 		}
 
-		constexpr bool operator!=(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr bool operator!=(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue != that.rawValue;
 		}
 
-		constexpr bool operator<(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr bool operator<(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue < that.rawValue;
 		}
 
-		constexpr bool operator>(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr bool operator>(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue > that.rawValue;
 		}
 
-		constexpr bool operator<=(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr bool operator<=(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue <= that.rawValue;
 		}
 
-		constexpr bool operator>=(quantity that) const
+		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
+		constexpr bool operator>=(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue >= that.rawValue;
 		}
 
-		template<typename N = Numerator, typename D = Denominator, typename
-			= std::enable_if_t<N::size == 0 && D::size == 0>>
+		template<typename N = Numerator, typename D = Denominator, typename =
+			std::enable_if_t<N::size == 0 && D::size == 0>>
 		constexpr operator NumericType()
 		{
 			return rawValue;
@@ -422,7 +442,7 @@ namespace unitscxx
 	};
 
 	template<typename MulType, typename NT, typename N, typename D, typename =
-		typename std::enable_if<std::is_arithmetic<MulType>::value>::type>
+		std::enable_if_t<std::is_arithmetic<MulType>::value>>
 	constexpr quantity<NT, N, D> operator*(MulType left, quantity<NT, N, D> right)
 	{
 		using unit_system = typename N::value_type;
@@ -433,7 +453,7 @@ namespace unitscxx
 	}
 
 	template<typename MulType, typename NT, typename N, typename D, typename =
-		typename std::enable_if<std::is_arithmetic<MulType>::value>::type>
+		std::enable_if_t<std::is_arithmetic<MulType>::value>>
 	constexpr quantity<NT, D, N> operator/(MulType left, quantity<NT, N, D> right)
 	{
 		using unit_system = typename N::value_type;
@@ -457,18 +477,20 @@ namespace unitscxx
 		return (1 / right) * left;
 	}
 
-	template<typename NT, typename N, typename D, typename
-		= typename std::enable_if<N::size == 0 && D::size == 0>::type>
-	constexpr auto operator+(NT lhs, quantity<NT, N, D> rhs)
+	template<typename RNT, typename NT, typename N, typename D, typename =
+		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
+	constexpr auto operator+(RNT lhs, quantity<NT, N, D> rhs)
 	{
-		return quantity<NT, N, D>(lhs + static_cast<NT>(rhs));
+		using ResNT = decltype(lhs + rhs);
+		return quantity<ResNT, N, D>(lhs + rhs);
 	}
 
-	template<typename NT, typename N, typename D, typename
-		= typename std::enable_if<N::size == 0 && D::size == 0>::type>
-	constexpr auto operator-(NT lhs, quantity<NT, N, D> rhs)
+	template<typename RNT, typename NT, typename N, typename D, typename =
+		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
+	constexpr auto operator-(RNT lhs, quantity<NT, N, D> rhs)
 	{
-		return quantity<NT, N, D>(lhs - static_cast<NT>(rhs));
+		using ResNT = decltype(lhs - rhs);
+		return quantity<ResNT, N, D>(lhs - rhs);
 	}
 
 	template<typename NumericType, typename UnitType, UnitType... U>
