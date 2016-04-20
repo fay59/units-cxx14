@@ -481,16 +481,16 @@ namespace unitscxx
 		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
 	constexpr auto operator+(RNT lhs, quantity<NT, N, D> rhs)
 	{
-		using ResNT = decltype(lhs + rhs);
-		return quantity<ResNT, N, D>(lhs + rhs);
+		using ResNT = decltype(lhs + static_cast<NT>(rhs));
+		return quantity<ResNT, N, D>(lhs + static_cast<NT>(rhs));
 	}
 
 	template<typename RNT, typename NT, typename N, typename D, typename =
 		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
 	constexpr auto operator-(RNT lhs, quantity<NT, N, D> rhs)
 	{
-		using ResNT = decltype(lhs - rhs);
-		return quantity<ResNT, N, D>(lhs - rhs);
+		using ResNT = decltype(lhs - static_cast<NT>(rhs));
+		return quantity<ResNT, N, D>(lhs - static_cast<NT>(rhs));
 	}
 
 	template<typename NumericType, typename UnitType, UnitType... U>
