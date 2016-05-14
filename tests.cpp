@@ -52,7 +52,7 @@ void static_sequence_tests()
 	sequence<size_t, 4, 5, 6> seq2;
 	auto seq3 = combine_sequences(seq1, seq2);
 	
-	auto leftOf5 = left_of<decltype(seq3), size_t, 5>::type{};
+	auto leftOf5 = left_of<decltype(seq3), size_t, 5>{};
 	static_assert(sequence_contains<size_t, 4>(leftOf5),
 		"left_of/sequence_contains");
 	static_assert(!sequence_contains<size_t, 5>(leftOf5),
@@ -60,7 +60,7 @@ void static_sequence_tests()
 	static_assert(!sequence_contains<size_t, 6>(leftOf5),
 		"left_of/sequence_contains");
 	
-	auto rightOf2 = right_of<decltype(seq3), size_t, 2>::type{};
+	auto rightOf2 = right_of<decltype(seq3), size_t, 2>{};
 	static_assert(!sequence_contains<size_t, 1>(rightOf2),
 		"right_of/sequence_contains");
 	static_assert(!sequence_contains<size_t, 2>(rightOf2),
@@ -68,7 +68,7 @@ void static_sequence_tests()
 	static_assert(sequence_contains<size_t, 3>(rightOf2),
 		"right_of/sequence_contains");
 	
-	auto no3 = removed_from<decltype(seq3), size_t, 3>::type{};
+	auto no3 = removed_from<decltype(seq3), size_t, 3>{};
 	static_assert(sequence_contains<size_t, 2>(no3),
 		"removed_from/sequence_contains");
 	static_assert(!sequence_contains<size_t, 3>(no3),
@@ -79,7 +79,7 @@ void static_sequence_tests()
 	static_assert(sequence_max<decltype(seq3)>::value == 6, "sequence_max");
 	
 	auto seq4 = combine_sequences(seq2, seq1);
-	auto seq4Sorted = sorted<decltype(seq4)>::type{};
+	auto seq4Sorted = sorted<decltype(seq4)>{};
 	static_assert(seq_get<0>(seq4Sorted) == 1, "sorted/seq_get");
 	static_assert(seq_get<1>(seq4Sorted) == 2, "sorted/seq_get");
 	static_assert(seq_get<2>(seq4Sorted) == 3, "sorted/seq_get");
@@ -88,7 +88,7 @@ void static_sequence_tests()
 	static_assert(seq_get<5>(seq4Sorted) == 6, "sorted/seq_get");
 	
 	auto seq5 = remove_intersection<decltype(seq4Sorted),
-		sequence<size_t, 2, 5>>::type{};
+		sequence<size_t, 2, 5>>{};
 	static_assert(seq_get<0>(seq5) == 1, "sorted/seq_get");
 	static_assert(seq_get<1>(seq5) == 3, "sorted/seq_get");
 	static_assert(seq_get<2>(seq5) == 4, "sorted/seq_get");
