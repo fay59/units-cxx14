@@ -435,7 +435,7 @@ namespace unitscxx
 
 		template<typename N = Numerator, typename D = Denominator, typename =
 			std::enable_if_t<N::size == 0 && D::size == 0>>
-		constexpr operator NumericType()
+		constexpr operator NumericType() const
 		{
 			return rawValue;
 		}
