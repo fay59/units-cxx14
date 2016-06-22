@@ -249,7 +249,16 @@ namespace unitscxx
 		quantity& operator=(const quantity&) = default;
 		quantity& operator=(quantity&&) = default;
 
+		template<typename N = Numerator, typename D = Denominator, typename =
+			std::enable_if_t<N::size != 0 || D::size != 0>>
 		explicit constexpr quantity(NumericType val)
+			: rawValue(val)
+		{
+		}
+
+		template<typename NT, typename N = Numerator, typename D = Denominator, typename =
+			std::enable_if_t<N::size == 0 && D::size == 0 && std::is_arithmetic<NT>::value>>
+		constexpr quantity(NT val)
 			: rawValue(val)
 		{
 		}
