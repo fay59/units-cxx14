@@ -493,6 +493,34 @@ namespace unitscxx
 		return quantity<ResNT, N, D>(lhs - static_cast<NT>(rhs));
 	}
 
+	template<typename RNT, typename NT, typename N, typename D, typename =
+		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
+	constexpr auto operator+=(RNT lhs, quantity<NT, N, D> rhs)
+	{
+		lhs += static_cast<NT>(rhs);
+	}
+
+	template<typename RNT, typename NT, typename N, typename D, typename =
+		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
+	constexpr auto operator-=(RNT lhs, quantity<NT, N, D> rhs)
+	{
+		lhs -= static_cast<NT>(rhs);
+	}
+
+	template<typename RNT, typename NT, typename N, typename D, typename =
+		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
+	constexpr auto operator*=(RNT lhs, quantity<NT, N, D> rhs)
+	{
+		lhs *= static_cast<NT>(rhs);
+	}
+
+	template<typename RNT, typename NT, typename N, typename D, typename =
+		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
+	constexpr auto operator/=(RNT lhs, quantity<NT, N, D> rhs)
+	{
+		lhs /= static_cast<NT>(rhs);
+	}
+
 	template<typename NumericType, typename UnitType, UnitType... U>
 	using unit_base = quantity<NumericType,
 		detail::sequence<UnitType, U...>,
