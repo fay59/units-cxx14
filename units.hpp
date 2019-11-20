@@ -26,6 +26,12 @@
 #ifndef UNITS_HPP
 #define UNITS_HPP
 
+#ifdef __has_cpp_attribute(nodiscard)
+#define UNITS_ATTR_NODISCARD [[nodiscard]]
+#else
+#define UNITS_ATTR_NODISCARD
+#endif
+
 #include <cstddef>
 #include <ratio>
 #include <type_traits>
@@ -267,32 +273,32 @@ namespace unitscxx
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr auto operator+(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator+(quantity<NT, Numerator, Denominator> that) const
 		{
 			using ResNT = decltype(rawValue + that.rawValue);
 			return quantity<ResNT, Numerator, Denominator>(rawValue + that.rawValue);
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr auto operator-(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator-(quantity<NT, Numerator, Denominator> that) const
 		{
 			using ResNT = decltype(rawValue - that.rawValue);
 			return quantity<ResNT, Numerator, Denominator>(rawValue - that.rawValue);
 		}
 
-		constexpr quantity operator+() const
+		UNITS_ATTR_NODISCARD constexpr quantity operator+() const
 		{
 			return quantity(+rawValue);
 		}
 
-		constexpr quantity operator-() const
+		UNITS_ATTR_NODISCARD constexpr quantity operator-() const
 		{
 			return quantity(-rawValue);
 		}
 
 		template<typename NT, typename N = Numerator, typename D = Denominator, typename =
 			std::enable_if_t<N::size == 0 && D::size == 0 && std::is_arithmetic<NT>::value>>
-		constexpr auto operator+(NT that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator+(NT that) const
 		{
 			using ResNT = decltype(rawValue + that);
 			return quantity<ResNT, N, D>(rawValue + that);
@@ -300,7 +306,7 @@ namespace unitscxx
 
 		template<typename NT, typename N = Numerator, typename D = Denominator, typename =
 			std::enable_if_t<N::size == 0 && D::size == 0 && std::is_arithmetic<NT>::value>>
-		constexpr auto operator-(NT that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator-(NT that) const
 		{
 			using ResNT = decltype(rawValue - that);
 			return quantity<ResNT, N, D>(rawValue - that);
@@ -321,14 +327,14 @@ namespace unitscxx
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr auto operator*(NT that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator*(NT that) const
 		{
 			using ResNT = decltype(rawValue * that);
 			return quantity<ResNT, Numerator, Denominator>(rawValue * that);
 		}
 
 		template<typename NT, typename N, typename D>
-		constexpr auto operator*(quantity<NT, N, D> that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator*(quantity<NT, N, D> that) const
 		{
 			using combined_numerator   = detail::combine<numerator, N>;
 			using combined_denominator = detail::combine<denominator, D>;
@@ -353,14 +359,14 @@ namespace unitscxx
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr auto operator/(NT that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator/(NT that) const
 		{
 			using ResNT = decltype(rawValue / that);
 			return quantity<ResNT, Numerator, Denominator>(rawValue / that);
 		}
 
 		template<typename NT, typename N, typename D>
-		constexpr auto operator/(quantity<NT, N, D> that) const
+		UNITS_ATTR_NODISCARD constexpr auto operator/(quantity<NT, N, D> that) const
 		{
 			// flip fraction rows around for division
 			using combined_numerator   = detail::combine<numerator, D>;
@@ -386,56 +392,56 @@ namespace unitscxx
 		}
 
 		template<intmax_t N, intmax_t D>
-		constexpr auto operator*(std::ratio<N, D>) const
+		UNITS_ATTR_NODISCARD constexpr auto operator*(std::ratio<N, D>) const
 		{
 			return (*this) * N / D;
 		}
 
 		template<intmax_t N, intmax_t D>
-		constexpr auto operator/(std::ratio<N, D>) const
+		UNITS_ATTR_NODISCARD constexpr auto operator/(std::ratio<N, D>) const
 		{
 			return (*this) / N * D;
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr bool operator==(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr bool operator==(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue == that.rawValue;
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr bool operator!=(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr bool operator!=(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue != that.rawValue;
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr bool operator<(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr bool operator<(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue < that.rawValue;
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr bool operator>(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr bool operator>(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue > that.rawValue;
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr bool operator<=(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr bool operator<=(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue <= that.rawValue;
 		}
 
 		template<typename NT, typename = std::enable_if_t<std::is_arithmetic<NT>::value>>
-		constexpr bool operator>=(quantity<NT, Numerator, Denominator> that) const
+		UNITS_ATTR_NODISCARD constexpr bool operator>=(quantity<NT, Numerator, Denominator> that) const
 		{
 			return rawValue >= that.rawValue;
 		}
 
 		template<typename N = Numerator, typename D = Denominator, typename =
 			std::enable_if_t<N::size == 0 && D::size == 0>>
-		constexpr operator NumericType() const
+		UNITS_ATTR_NODISCARD constexpr operator NumericType() const
 		{
 			return rawValue;
 		}
@@ -443,7 +449,7 @@ namespace unitscxx
 
 	template<typename MulType, typename NT, typename N, typename D, typename =
 		std::enable_if_t<std::is_arithmetic<MulType>::value>>
-	constexpr quantity<NT, N, D> operator*(MulType left, quantity<NT, N, D> right)
+	UNITS_ATTR_NODISCARD constexpr quantity<NT, N, D> operator*(MulType left, quantity<NT, N, D> right)
 	{
 		using unit_system = typename N::value_type;
 		using unitless_quantity = quantity<NT,
@@ -454,7 +460,7 @@ namespace unitscxx
 
 	template<typename MulType, typename NT, typename N, typename D, typename =
 		std::enable_if_t<std::is_arithmetic<MulType>::value>>
-	constexpr quantity<NT, D, N> operator/(MulType left, quantity<NT, N, D> right)
+	UNITS_ATTR_NODISCARD constexpr quantity<NT, D, N> operator/(MulType left, quantity<NT, N, D> right)
 	{
 		using unit_system = typename N::value_type;
 		using unitless_quantity = quantity<NT,
@@ -464,14 +470,14 @@ namespace unitscxx
 	}
 
 	template<intmax_t RN, intmax_t RD, typename QNT, typename QN, typename QD>
-	constexpr quantity<QNT, QN, QD> operator*(
+	UNITS_ATTR_NODISCARD constexpr quantity<QNT, QN, QD> operator*(
 		std::ratio<RN, RD> left, quantity<QNT, QN, QD> right)
 	{
 		return right * left;
 	}
 
 	template<intmax_t RN, intmax_t RD, typename QNT, typename QN, typename QD>
-	constexpr quantity<QNT, QD, QN> operator/(
+	UNITS_ATTR_NODISCARD constexpr quantity<QNT, QD, QN> operator/(
 		std::ratio<RN, RD> left, quantity<QNT, QN, QD> right)
 	{
 		return (1 / right) * left;
@@ -479,7 +485,7 @@ namespace unitscxx
 
 	template<typename RNT, typename NT, typename N, typename D, typename =
 		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
-	constexpr auto operator+(RNT lhs, quantity<NT, N, D> rhs)
+	UNITS_ATTR_NODISCARD constexpr auto operator+(RNT lhs, quantity<NT, N, D> rhs)
 	{
 		using ResNT = decltype(lhs + static_cast<NT>(rhs));
 		return quantity<ResNT, N, D>(lhs + static_cast<NT>(rhs));
@@ -487,7 +493,7 @@ namespace unitscxx
 
 	template<typename RNT, typename NT, typename N, typename D, typename =
 		std::enable_if_t<std::is_arithmetic<RNT>::value && N::size == 0 && D::size == 0>>
-	constexpr auto operator-(RNT lhs, quantity<NT, N, D> rhs)
+	UNITS_ATTR_NODISCARD constexpr auto operator-(RNT lhs, quantity<NT, N, D> rhs)
 	{
 		using ResNT = decltype(lhs - static_cast<NT>(rhs));
 		return quantity<ResNT, N, D>(lhs - static_cast<NT>(rhs));
